@@ -23,6 +23,7 @@ const Navbar = () => {
 
   const [sesion, setSesion] = useState<Sesion>(leerSesion);
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [navAbierto, setNavAbierto] = useState(false);
   const [busqueda, setBusqueda] = useState(searchParams.get('q') ?? '');
 
   const totalItems = cart.reduce((suma, item) => suma + item.cantidad, 0);
@@ -30,11 +31,23 @@ const Navbar = () => {
   useEffect(() => {
     setSesion(leerSesion());
     setMenuAbierto(false);
+    setNavAbierto(false);
   }, [location.pathname]);
 
   useEffect(() => {
     setBusqueda(searchParams.get('q') ?? '');
   }, [searchParams]);
+
+  useEffect(() => {
+    if (!navAbierto) return;
+
+    const cerrarConEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setNavAbierto(false);
+    };
+
+    document.addEventListener('keydown', cerrarConEscape);
+    return () => document.removeEventListener('keydown', cerrarConEscape);
+  }, [navAbierto]);
 
   useEffect(() => {
     if (!menuAbierto) return;
@@ -74,13 +87,32 @@ const Navbar = () => {
       <div className="aviso-envio">Envío gratis sobre $30.000 · Despacho a todo Chile</div>
       <header className="encabezado">
         <div className="encabezado-interior">
+          <button
+            type="button"
+            className="boton boton-menu"
+            aria-label={navAbierto ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={navAbierto}
+            aria-controls="nav-principal"
+            onClick={() => setNavAbierto((abierto) => !abierto)}
+          >
+            <Icono nombre={navAbierto ? 'cerrar' : 'menu'} />
+          </button>
+
           <Link to="/" className="logo">
             <Icono nombre="globo" />
             SensoriToys
           </Link>
 
-          <nav aria-label="Principal" className="nav-principal">
+          <nav
+            id="nav-principal"
+            aria-label="Principal"
+            className={`nav-principal${navAbierto ? ' abierto' : ''}`}
+            onClick={() => setNavAbierto(false)}
+          >
             <NavLink to="/" end>Catálogo</NavLink>
+            {!sesion.sesionIniciada && (
+              <NavLink to="/registro" className="nav-crear-cuenta">Crear cuenta</NavLink>
+            )}
           </nav>
 
           <form role="search" className="buscador" onSubmit={handleBuscar}>
@@ -112,8 +144,8 @@ const Navbar = () => {
                   onClick={() => setMenuAbierto((abierto) => !abierto)}
                 >
                   <Icono nombre="usuario" />
-                  Mi cuenta
-                  <Icono nombre="chevron" />
+                  <span className="etiqueta-responsive">Mi cuenta</span>
+                  <span className="etiqueta-responsive"><Icono nombre="chevron" /></span>
                 </button>
                 {menuAbierto && (
                   <ul id="menu-cuenta" className="menu-desplegable">
@@ -134,7 +166,7 @@ const Navbar = () => {
               <>
                 <Link to="/login" className="boton boton-amarillo">
                   <Icono nombre="usuario" />
-                  Ingresar
+                  <span className="etiqueta-responsive">Ingresar</span>
                 </Link>
                 <Link to="/registro" className="enlace-crear-cuenta">Crear cuenta</Link>
               </>

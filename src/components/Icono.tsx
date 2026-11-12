@@ -24,7 +24,9 @@ const iconos = {
       <path d="M12 17v4" />
     </>
   ),
-  chevron: <path d="M6 9l6 6 6-6" />
+  chevron: <path d="M6 9l6 6 6-6" />,
+  menu: <path d="M4 6h16M4 12h16M4 18h16" />,
+  cerrar: <path d="M6 6l12 12M18 6L6 18" />
 };
 
 export type NombreIcono = keyof typeof iconos;

@@ -34,74 +34,80 @@ const Register = () => {
   };
 
   return (
-    <div className="contenedor contenedor-angosto">
-      <section className="tarjeta" aria-labelledby="titulo-registro">
-        <h1 id="titulo-registro">Crear cuenta</h1>
+    <div className="contenedor">
+      <div className="row justify-content-center">
+        <div className="col-12 col-md-10 col-lg-8 col-xl-6">
+          <section className="tarjeta" aria-labelledby="titulo-registro">
+            <h1 id="titulo-registro">Crear cuenta</h1>
 
-        {error && <p role="alert" className="mensaje mensaje-error">{error}</p>}
+            {error && <p role="alert" className="mensaje mensaje-error">{error}</p>}
 
-        <form onSubmit={handleSubmit} className="formulario">
-          <div className="campo">
-            <label htmlFor="nombre">Nombre completo</label>
-            <input
-              id="nombre"
-              name="nombre"
-              type="text"
-              autoComplete="name"
-              value={nombre}
-              onChange={(event) => setNombre(event.target.value)}
-              required
-            />
-          </div>
+            <form onSubmit={handleSubmit} className="row g-3 my-2">
+              <div className="campo col-12">
+                <label htmlFor="nombre">Nombre completo</label>
+                <input
+                  id="nombre"
+                  name="nombre"
+                  type="text"
+                  autoComplete="name"
+                  value={nombre}
+                  onChange={(event) => setNombre(event.target.value)}
+                  required
+                />
+              </div>
 
-          <div className="campo">
-            <label htmlFor="email">Correo electrónico</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-            />
-          </div>
+              <div className="campo col-12">
+                <label htmlFor="email">Correo electrónico</label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                />
+              </div>
 
-          <div className="campo">
-            <label htmlFor="contrasenia">Contraseña</label>
-            <input
-              id="contrasenia"
-              name="contrasenia"
-              type="password"
-              autoComplete="new-password"
-              value={contrasenia}
-              onChange={(event) => setContrasenia(event.target.value)}
-              required
-            />
-          </div>
+              <div className="campo col-12 col-md-6">
+                <label htmlFor="contrasenia">Contraseña</label>
+                <input
+                  id="contrasenia"
+                  name="contrasenia"
+                  type="password"
+                  autoComplete="new-password"
+                  value={contrasenia}
+                  onChange={(event) => setContrasenia(event.target.value)}
+                  required
+                />
+              </div>
 
-          <div className="campo">
-            <label htmlFor="confirmacion">Confirmar contraseña</label>
-            <input
-              id="confirmacion"
-              name="confirmacion"
-              type="password"
-              autoComplete="new-password"
-              value={confirmacion}
-              onChange={(event) => setConfirmacion(event.target.value)}
-              required
-            />
-          </div>
+              <div className="campo col-12 col-md-6">
+                <label htmlFor="confirmacion">Confirmar contraseña</label>
+                <input
+                  id="confirmacion"
+                  name="confirmacion"
+                  type="password"
+                  autoComplete="new-password"
+                  value={confirmacion}
+                  onChange={(event) => setConfirmacion(event.target.value)}
+                  required
+                />
+              </div>
 
-          <button type="submit" className="boton boton-primario" disabled={enviando}>
-            {enviando ? 'Creando cuenta…' : 'Crear cuenta'}
-          </button>
-        </form>
+              <div className="col-12 d-grid">
+                <button type="submit" className="boton boton-primario" disabled={enviando}>
+                  {enviando ? 'Creando cuenta…' : 'Crear cuenta'}
+                </button>
+              </div>
+            </form>
 
-        <p className="texto-suave centrado">
-          ¿Ya tienes cuenta? <Link to="/login">Iniciar sesión</Link>
-        </p>
-      </section>
+            <p className="texto-suave centrado">
+              ¿Ya tienes cuenta? <Link to="/login">Iniciar sesión</Link>
+            </p>
+          </section>
+        </div>
+      </div>
     </div>
   );
 };

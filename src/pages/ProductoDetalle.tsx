@@ -74,32 +74,38 @@ const ProductoDetalle = () => {
       <Link to="/" className="enlace-volver">← Volver al catálogo</Link>
 
       <article className="detalle">
-        <div className="detalle-imagen">
-          {producto.imagenUrl ? (
-            <img src={producto.imagenUrl} alt={producto.nombre} />
-          ) : (
-            <span className="sin-imagen">Sin imagen</span>
-          )}
-        </div>
+        <div className="row g-0">
+          <div className="col-12 col-md-6">
+            <div className="detalle-imagen">
+              {producto.imagenUrl ? (
+                <img src={producto.imagenUrl} alt={producto.nombre} />
+              ) : (
+                <span className="sin-imagen">Sin imagen</span>
+              )}
+            </div>
+          </div>
 
-        <div className="detalle-info">
-          <span className="tarjeta-meta">
-            {[producto.categoria?.nombre, producto.edad].filter(Boolean).join(' · ')}
-          </span>
-          <h1>{producto.nombre}</h1>
-          <p className="precio precio-grande">${producto.precio.toLocaleString('es-CL')}</p>
-          {producto.descripcion && <p>{producto.descripcion}</p>}
+          <div className="col-12 col-md-6">
+            <div className="detalle-info">
+              <span className="tarjeta-meta">
+                {[producto.categoria?.nombre, producto.edad].filter(Boolean).join(' · ')}
+              </span>
+              <h1>{producto.nombre}</h1>
+              <p className="precio precio-grande">${producto.precio.toLocaleString('es-CL')}</p>
+              {producto.descripcion && <p>{producto.descripcion}</p>}
 
-          <p className={agotado ? 'etiqueta etiqueta-agotado' : 'texto-suave'}>
-            {agotado ? 'Agotado' : `Disponible: ${producto.stock} unidades`}
-          </p>
+              <p className={agotado ? 'etiqueta etiqueta-agotado' : 'texto-suave'}>
+                {agotado ? 'Agotado' : `Disponible: ${producto.stock} unidades`}
+              </p>
 
-          <button type="button" className="boton boton-naranja" disabled={agotado} onClick={handleAgregar}>
-            {agotado ? 'Agotado' : agregado ? 'Agregado al carrito' : 'Agregar al carrito'}
-          </button>
-          <span className="solo-lectores" role="status">
-            {agregado ? `${producto.nombre} agregado al carrito` : ''}
-          </span>
+              <button type="button" className="boton boton-naranja" disabled={agotado} onClick={handleAgregar}>
+                {agotado ? 'Agotado' : agregado ? 'Agregado al carrito' : 'Agregar al carrito'}
+              </button>
+              <span className="solo-lectores" role="status">
+                {agregado ? `${producto.nombre} agregado al carrito` : ''}
+              </span>
+            </div>
+          </div>
         </div>
       </article>
     </div>

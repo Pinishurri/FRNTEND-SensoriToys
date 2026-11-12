@@ -6,9 +6,11 @@ interface ProductoListProps {
 }
 
 const ProductoList = ({ productos }: ProductoListProps) => (
-  <div className="grilla-productos">
+  <div className="row g-4">
     {productos.map((producto) => (
-      <ProductoCard key={producto.id} producto={producto} />
+      <div key={producto.id} className="col-12 col-sm-6 col-lg-4">
+        <ProductoCard producto={producto} />
+      </div>
     ))}
   </div>
 );

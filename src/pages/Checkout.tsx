@@ -98,11 +98,11 @@ const Checkout = () => {
     };
 
     return (
-        <div className="container-fluid px-4 py-4 mb-5" style={{ backgroundColor: '#f4f7fc', minHeight: '100vh' }}>
-            <div className="row g-4 justify-content-center">
-                
+        <div className="contenedor">
+            <div className="row g-4">
+
                 {/* COLUMNA IZQUIERDA: Formulario */}
-                <div className="col-lg-7 col-xl-8">
+                <div className="col-12 col-lg-8">
                     <form onSubmit={handleSubmit}>
                         {/* 1. Datos del Cliente */}
                         <div className="card border-0 shadow-sm p-4 rounded-4 bg-white mb-4">
@@ -110,26 +110,26 @@ const Checkout = () => {
                                 <i className="bi bi-person me-2"></i> Datos del Cliente
                             </h5>
                             <div className="row g-3">
-                                <div className="col-md-6">
+                                <div className="col-12 col-md-6">
                                     <label className="form-label text-muted small fw-semibold">Nombre*</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control rounded-3" 
+                                    <input
+                                        type="text"
+                                        className="form-control rounded-3"
                                         placeholder="Ej: Ignacio"
-                                        required 
+                                        required
                                         value={formData.nombre}
-                                        onChange={e => setFormData({...formData, nombre: e.target.value})} 
+                                        onChange={e => setFormData({ ...formData, nombre: e.target.value })}
                                     />
                                 </div>
-                                <div className="col-md-6">
+                                <div className="col-12 col-md-6">
                                     <label className="form-label text-muted small fw-semibold">Apellido*</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control rounded-3" 
+                                    <input
+                                        type="text"
+                                        className="form-control rounded-3"
                                         placeholder="Ej: Valenzuela"
-                                        required 
+                                        required
                                         value={formData.apellido}
-                                        onChange={e => setFormData({...formData, apellido: e.target.value})} 
+                                        onChange={e => setFormData({ ...formData, apellido: e.target.value })}
                                     />
                                 </div>
                             </div>
@@ -146,39 +146,39 @@ const Checkout = () => {
                             </div>
 
                             <div className="row g-3 mb-3">
-                                <div className="col-md-6">
+                                <div className="col-12 col-md-8">
                                     <label className="form-label text-muted small fw-semibold">Calle*</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control rounded-3" 
+                                    <input
+                                        type="text"
+                                        className="form-control rounded-3"
                                         placeholder="Ej: Manuel Montt"
-                                        required 
+                                        required
                                         value={formData.calle}
-                                        onChange={e => setFormData({...formData, calle: e.target.value})} 
+                                        onChange={e => setFormData({ ...formData, calle: e.target.value })}
                                     />
                                 </div>
-                                <div className="col-md-6">
+                                <div className="col-12 col-md-4">
                                     <label className="form-label text-muted small fw-semibold">Número*</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control rounded-3" 
+                                    <input
+                                        type="text"
+                                        className="form-control rounded-3"
                                         placeholder="Ej: 123"
-                                        required 
+                                        required
                                         value={formData.numero}
-                                        onChange={e => setFormData({...formData, numero: e.target.value})} 
+                                        onChange={e => setFormData({ ...formData, numero: e.target.value })}
                                     />
                                 </div>
                             </div>
 
                             {/* MENÚS DESPLEGABLES DE COMUNA Y CIUDAD */}
                             <div className="row g-3 mb-3">
-                                <div className="col-md-6">
+                                <div className="col-12 col-md-6">
                                     <label className="form-label text-muted small fw-semibold">Comuna*</label>
-                                    <select 
-                                        className="form-select rounded-3" 
-                                        required 
+                                    <select
+                                        className="form-select rounded-3"
+                                        required
                                         value={formData.comuna}
-                                        onChange={e => setFormData({...formData, comuna: e.target.value})}
+                                        onChange={e => setFormData({ ...formData, comuna: e.target.value })}
                                     >
                                         <option value="">Seleccionar comuna</option>
                                         {COMUNAS_CHILE.map(c => (
@@ -186,13 +186,13 @@ const Checkout = () => {
                                         ))}
                                     </select>
                                 </div>
-                                <div className="col-md-6">
+                                <div className="col-12 col-md-6">
                                     <label className="form-label text-muted small fw-semibold">Ciudad*</label>
-                                    <select 
-                                        className="form-select rounded-3" 
-                                        required 
+                                    <select
+                                        className="form-select rounded-3"
+                                        required
                                         value={formData.ciudad}
-                                        onChange={e => setFormData({...formData, ciudad: e.target.value})}
+                                        onChange={e => setFormData({ ...formData, ciudad: e.target.value })}
                                     >
                                         <option value="">Seleccionar ciudad</option>
                                         {CIUDADES_CHILE.map(c => (
@@ -203,24 +203,24 @@ const Checkout = () => {
                             </div>
 
                             <div className="row g-3">
-                                <div className="col-md-6">
+                                <div className="col-12 col-md-6">
                                     <label className="form-label text-muted small fw-semibold">Depto / Oficina / Nº Casa</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control rounded-3" 
+                                    <input
+                                        type="text"
+                                        className="form-control rounded-3"
                                         placeholder="Ej: Oficina 456"
                                         value={formData.deptoOficina}
-                                        onChange={e => setFormData({...formData, deptoOficina: e.target.value})} 
+                                        onChange={e => setFormData({ ...formData, deptoOficina: e.target.value })}
                                     />
                                 </div>
-                                <div className="col-md-6">
+                                <div className="col-12 col-md-6">
                                     <label className="form-label text-muted small fw-semibold">Información adicional</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control rounded-3" 
+                                    <input
+                                        type="text"
+                                        className="form-control rounded-3"
                                         placeholder="Ej: Dejar en el casillero"
                                         value={formData.infoAdicional}
-                                        onChange={e => setFormData({...formData, infoAdicional: e.target.value})} 
+                                        onChange={e => setFormData({ ...formData, infoAdicional: e.target.value })}
                                     />
                                 </div>
                             </div>
@@ -231,14 +231,14 @@ const Checkout = () => {
                             <h5 className="fw-bold mb-3" style={{ color: '#16498C' }}>3. Método de Pago</h5>
                             <div>
                                 <label className="form-label text-muted small fw-semibold">Número de Tarjeta (Simulado)*</label>
-                                <input 
-                                    type="text" 
-                                    className="form-control rounded-3" 
+                                <input
+                                    type="text"
+                                    className="form-control rounded-3"
                                     placeholder="XXXX XXXX XXXX XXXX"
-                                    required 
+                                    required
                                     maxLength={16}
                                     value={formData.tarjeta}
-                                    onChange={e => setFormData({...formData, tarjeta: e.target.value})} 
+                                    onChange={e => setFormData({ ...formData, tarjeta: e.target.value })}
                                 />
                             </div>
                         </div>
@@ -254,8 +254,8 @@ const Checkout = () => {
                 </div>
 
                 {/* COLUMNA DERECHA: Resumen Tu Carro */}
-                <div className="col-lg-5 col-xl-4">
-                    <div className="card border-0 shadow-sm p-4 rounded-4 bg-white sticky-top" style={{ top: '20px' }}>
+                <div className="col-12 col-lg-4">
+                    <div className="card border-0 shadow-sm p-4 rounded-4 bg-white sticky-lg-top" style={{ top: '20px' }}>
                         <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
                             <h5 className="fw-bold mb-0 d-flex align-items-center" style={{ color: '#16498C' }}>
                                 <i className="bi bi-cart3 me-2"></i> Tu carro ({totalItemsCount} Producto{totalItemsCount !== 1 ? 's' : ''})
@@ -271,11 +271,11 @@ const Checkout = () => {
                                 return (
                                     <div key={item.id} className="d-flex align-items-center justify-content-between py-2 border-bottom">
                                         <div className="d-flex align-items-center me-2">
-                                            <img 
-                                                src={item.imagenUrl || item.img || 'https://via.placeholder.com/50'} 
-                                                alt={item.nombre || item.name} 
-                                                className="rounded-2 me-2" 
-                                                style={{ width: '45px', height: '45px', objectFit: 'cover' }} 
+                                            <img
+                                                src={item.imagenUrl || item.img || 'https://via.placeholder.com/50'}
+                                                alt={item.nombre || item.name}
+                                                className="rounded-2 me-2"
+                                                style={{ width: '45px', height: '45px', objectFit: 'cover' }}
                                             />
                                             <div>
                                                 <h6 className="mb-0 small fw-bold text-dark">{item.nombre || item.name}</h6>
@@ -322,8 +322,8 @@ const Checkout = () => {
                                 <p className="text-muted mb-4 px-2 fs-6">
                                     ¡Gracias por tu compra, <strong>{completedOrder.cliente}</strong>! Tu pedido <strong>#{completedOrder.id}</strong> está en camino a {completedOrder.direccion}.
                                 </p>
-                                <button 
-                                    type="button" 
+                                <button
+                                    type="button"
                                     className="btn text-white rounded-3 px-5 py-2 fw-bold"
                                     style={{ backgroundColor: '#16498C' }}
                                     onClick={handleAcceptModal}

@@ -65,24 +65,26 @@ const Pedidos = () => {
       )}
 
       {!loading && !error && pedidos.length > 0 && (
-        <ul className="lista-pedidos">
+        <ul className="row g-4 list-unstyled">
           {pedidos.map((pedido) => (
-            <li key={pedido.id} className="tarjeta">
-              <div className="pedido-cabecera">
-                <h2>Pedido #{pedido.id}</h2>
-                <span className="texto-suave">
-                  {new Date(pedido.fechaCreacion).toLocaleDateString('es-CL')}
-                </span>
+            <li key={pedido.id} className="col-12 col-md-6 col-lg-4">
+              <div className="tarjeta h-100">
+                <div className="pedido-cabecera">
+                  <h2>Pedido #{pedido.id}</h2>
+                  <span className="texto-suave">
+                    {new Date(pedido.fechaCreacion).toLocaleDateString('es-CL')}
+                  </span>
+                </div>
+                <ul className="pedido-detalle">
+                  {(pedido.detalles ?? []).map((detalle) => (
+                    <li key={detalle.id}>
+                      {detalle.cantidad} × {nombreProducto(detalle.productoId)} — $
+                      {detalle.precioUnitario.toLocaleString('es-CL')} c/u
+                    </li>
+                  ))}
+                </ul>
+                <p className="precio">Total: ${pedido.total.toLocaleString('es-CL')}</p>
               </div>
-              <ul className="pedido-detalle">
-                {(pedido.detalles ?? []).map((detalle) => (
-                  <li key={detalle.id}>
-                    {detalle.cantidad} × {nombreProducto(detalle.productoId)} — $
-                    {detalle.precioUnitario.toLocaleString('es-CL')} c/u
-                  </li>
-                ))}
-              </ul>
-              <p className="precio">Total: ${pedido.total.toLocaleString('es-CL')}</p>
             </li>
           ))}
         </ul>

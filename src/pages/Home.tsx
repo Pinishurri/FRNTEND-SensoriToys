@@ -40,33 +40,41 @@ const Home = () => {
   return (
     <div className="contenedor">
       <section className="portada" aria-labelledby="titulo-portada">
-        <div>
-          <h1 id="titulo-portada">Juguetes para sentir, calmar y aprender</h1>
-          <p>Estimulación táctil, visual y auditiva pensada para el desarrollo y la autorregulación emocional.</p>
-          <a href="#catalogo" className="boton boton-naranja">Ver catálogo</a>
+        <div className="row align-items-center g-4">
+          <div className="col-12 col-lg-8">
+            <h1 id="titulo-portada">Juguetes para sentir, calmar y aprender</h1>
+            <p>Estimulación táctil, visual y auditiva pensada para el desarrollo y la autorregulación emocional.</p>
+            <a href="#catalogo" className="boton boton-naranja">Ver catálogo</a>
+          </div>
+          <div className="col-lg-4 d-none d-lg-block">
+            <div className="portada-decoracion" aria-hidden="true" />
+          </div>
         </div>
-        <div className="portada-decoracion" aria-hidden="true" />
       </section>
 
       <section id="catalogo" aria-labelledby="titulo-catalogo" className="seccion-catalogo">
         <h2 id="titulo-catalogo">Catálogo</h2>
 
         {productos.length > 0 && (
-          <div className="filtros">
-            <FiltroChips
-              etiqueta="Categoría"
-              textoTodos="Todas"
-              opciones={categorias}
-              valor={categoria}
-              onChange={setCategoria}
-            />
-            <FiltroChips
-              etiqueta="Edad recomendada"
-              textoTodos="Todas las edades"
-              opciones={edades}
-              valor={edad}
-              onChange={setEdad}
-            />
+          <div className="row g-3 filtros">
+            <div className="col-12 col-md-6">
+              <FiltroChips
+                etiqueta="Categoría"
+                textoTodos="Todas"
+                opciones={categorias}
+                valor={categoria}
+                onChange={setCategoria}
+              />
+            </div>
+            <div className="col-12 col-md-6">
+              <FiltroChips
+                etiqueta="Edad recomendada"
+                textoTodos="Todas las edades"
+                opciones={edades}
+                valor={edad}
+                onChange={setEdad}
+              />
+            </div>
           </div>
         )}
 

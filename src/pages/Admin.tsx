@@ -270,8 +270,8 @@ const Admin = () => {
     ];
 
     return (
-        <div className="container-fluid px-4 py-4" style={{ backgroundColor: '#f4f7fc', minHeight: '100vh' }}>
-            <div className="d-flex justify-content-between align-items-center mb-4">
+        <div className="contenedor">
+            <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
                 <div className="d-flex align-items-center gap-3">
                     <div className="rounded-circle p-3 text-white" style={{ backgroundColor: '#16498C' }}>
                         <i className="bi bi-speedometer2 fs-3" aria-hidden="true"></i>
@@ -319,25 +319,25 @@ const Admin = () => {
 
             {!cargando && !errorCarga && pestania === 'dashboard' && (
                 <div className="row g-4">
-                    <div className="col-md-3">
+                    <div className="col-12 col-sm-6 col-lg-3">
                         <div className="card border-0 shadow-sm p-3 rounded-4 bg-white">
                             <span className="text-muted small fw-semibold">Ventas Totales</span>
                             <p className="fs-3 fw-bold mt-2 mb-0 text-success">${ventasTotales.toLocaleString('es-CL')}</p>
                         </div>
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-12 col-sm-6 col-lg-3">
                         <div className="card border-0 shadow-sm p-3 rounded-4 bg-white">
                             <span className="text-muted small fw-semibold">Pedidos Registrados</span>
                             <p className="fs-3 fw-bold mt-2 mb-0" style={{ color: '#16498C' }}>{pedidos.length}</p>
                         </div>
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-12 col-sm-6 col-lg-3">
                         <div className="card border-0 shadow-sm p-3 rounded-4 bg-white">
                             <span className="text-muted small fw-semibold">Usuarios Registrados</span>
                             <p className="fs-3 fw-bold mt-2 mb-0" style={{ color: '#16498C' }}>{usuarios.length}</p>
                         </div>
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-12 col-sm-6 col-lg-3">
                         <div className="card border-0 shadow-sm p-3 rounded-4 bg-white">
                             <span className="text-muted small fw-semibold">Productos con Stock Bajo</span>
                             <p className="fs-3 fw-bold mt-2 mb-0 text-danger">{productosStockBajo}</p>
@@ -347,8 +347,8 @@ const Admin = () => {
             )}
 
             {!cargando && !errorCarga && pestania === 'productos' && (
-                <div className="card border-0 shadow-sm rounded-4 bg-white p-4">
-                    <div className="d-flex justify-content-between align-items-center mb-3">
+                <div className="card border-0 shadow-sm rounded-4 bg-white p-3 p-md-4">
+                    <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                         <h2 className="fs-5 fw-bold text-dark mb-0">Inventario Registrado</h2>
                         <button
                             type="button"
@@ -360,7 +360,7 @@ const Admin = () => {
                         </button>
                     </div>
                     <div className="table-responsive">
-                        <table className="table align-middle">
+                        <table className="table align-middle tabla-apilable">
                             <thead>
                                 <tr>
                                     <th scope="col">ID</th>
@@ -376,22 +376,22 @@ const Admin = () => {
                             <tbody>
                                 {productos.map((p) => (
                                     <tr key={p.id}>
-                                        <td>{p.id}</td>
-                                        <td className="fw-bold">{p.nombre}</td>
-                                        <td>{p.categoria?.nombre ?? '—'}</td>
-                                        <td>{p.edad ?? '—'}</td>
-                                        <td>${p.precio.toLocaleString('es-CL')}</td>
-                                        <td>
+                                        <td data-label="ID">{p.id}</td>
+                                        <td data-label="Nombre" className="fw-bold">{p.nombre}</td>
+                                        <td data-label="Categoría">{p.categoria?.nombre ?? '—'}</td>
+                                        <td data-label="Edad">{p.edad ?? '—'}</td>
+                                        <td data-label="Precio">${p.precio.toLocaleString('es-CL')}</td>
+                                        <td data-label="Stock">
                                             <span className={`badge ${p.stock <= STOCK_BAJO ? 'bg-danger' : 'bg-success'}`}>
                                                 {p.stock} unidades
                                             </span>
                                         </td>
-                                        <td>
+                                        <td data-label="Estado">
                                             <span className={`badge ${p.activo !== false ? 'bg-primary' : 'bg-secondary'}`}>
                                                 {p.activo !== false ? 'Activo' : 'Desactivado'}
                                             </span>
                                         </td>
-                                        <td>
+                                        <td data-label="Acciones">
                                             <button
                                                 type="button"
                                                 className="btn btn-sm btn-outline-primary"
@@ -414,10 +414,10 @@ const Admin = () => {
             )}
 
             {!cargando && !errorCarga && pestania === 'pedidos' && (
-                <div className="card border-0 shadow-sm rounded-4 bg-white p-4">
+                <div className="card border-0 shadow-sm rounded-4 bg-white p-3 p-md-4">
                     <h2 className="fs-5 fw-bold text-dark mb-3">Historial de Ventas Registradas</h2>
                     <div className="table-responsive">
-                        <table className="table align-middle">
+                        <table className="table align-middle tabla-apilable">
                             <thead>
                                 <tr>
                                     <th scope="col">ID Pedido</th>
@@ -430,15 +430,15 @@ const Admin = () => {
                             <tbody>
                                 {[...pedidos].sort((a, b) => b.id - a.id).map((pedido) => (
                                     <tr key={pedido.id}>
-                                        <td className="fw-bold">#{pedido.id}</td>
-                                        <td>{new Date(pedido.fechaCreacion).toLocaleDateString('es-CL')}</td>
-                                        <td>{nombreCliente(pedido.usuarioId)}</td>
-                                        <td>
+                                        <td data-label="ID Pedido" className="fw-bold">#{pedido.id}</td>
+                                        <td data-label="Fecha">{new Date(pedido.fechaCreacion).toLocaleDateString('es-CL')}</td>
+                                        <td data-label="Cliente">{nombreCliente(pedido.usuarioId)}</td>
+                                        <td data-label="Detalle">
                                             {(pedido.detalles ?? [])
                                                 .map((d) => `${d.cantidad} × ${nombreProducto(d.productoId)}`)
                                                 .join(', ')}
                                         </td>
-                                        <td className="fw-bold" style={{ color: '#16498C' }}>
+                                        <td data-label="Total" className="fw-bold" style={{ color: '#16498C' }}>
                                             ${pedido.total.toLocaleString('es-CL')}
                                         </td>
                                     </tr>
@@ -455,10 +455,10 @@ const Admin = () => {
             )}
 
             {!cargando && !errorCarga && pestania === 'usuarios' && (
-                <div className="card border-0 shadow-sm rounded-4 bg-white p-4">
+                <div className="card border-0 shadow-sm rounded-4 bg-white p-3 p-md-4">
                     <h2 className="fs-5 fw-bold text-dark mb-3">Usuarios Registrados</h2>
                     <div className="table-responsive">
-                        <table className="table align-middle">
+                        <table className="table align-middle tabla-apilable">
                             <thead>
                                 <tr>
                                     <th scope="col">Usuario</th>
@@ -471,19 +471,19 @@ const Admin = () => {
                             <tbody>
                                 {usuarios.map((u) => (
                                     <tr key={u.id}>
-                                        <td className="fw-bold">{nombreCompleto(u)}</td>
-                                        <td>{u.email}</td>
-                                        <td>
+                                        <td data-label="Usuario" className="fw-bold">{nombreCompleto(u)}</td>
+                                        <td data-label="Correo">{u.email}</td>
+                                        <td data-label="Rol">
                                             <span className={`badge ${u.rol === 'ADMIN' ? 'bg-danger' : 'bg-primary'}`}>
                                                 {u.rol ?? '—'}
                                             </span>
                                         </td>
-                                        <td>
+                                        <td data-label="Estado">
                                             <span className={`badge ${u.estado === 'ACTIVO' ? 'bg-success' : 'bg-secondary'}`}>
                                                 {u.estado === 'ACTIVO' ? 'Activo' : 'Inactivo'}
                                             </span>
                                         </td>
-                                        <td>
+                                        <td data-label="Acciones">
                                             <button
                                                 type="button"
                                                 className="btn btn-sm btn-outline-primary"
@@ -536,7 +536,7 @@ const Admin = () => {
                                         />
                                     </div>
                                     <div className="row g-2 mb-3">
-                                        <div className="col-6">
+                                        <div className="col-12 col-sm-6">
                                             <label htmlFor="producto-precio" className="form-label text-muted small fw-semibold">Precio ($)</label>
                                             <input
                                                 id="producto-precio"
@@ -548,7 +548,7 @@ const Admin = () => {
                                                 required
                                             />
                                         </div>
-                                        <div className="col-6">
+                                        <div className="col-12 col-sm-6">
                                             <label htmlFor="producto-stock" className="form-label text-muted small fw-semibold">Stock</label>
                                             <input
                                                 id="producto-stock"
@@ -562,7 +562,7 @@ const Admin = () => {
                                         </div>
                                     </div>
                                     <div className="row g-2 mb-3">
-                                        <div className="col-6">
+                                        <div className="col-12 col-sm-6">
                                             <label htmlFor="producto-categoria" className="form-label text-muted small fw-semibold">Categoría</label>
                                             <select
                                                 id="producto-categoria"
@@ -577,7 +577,7 @@ const Admin = () => {
                                                 ))}
                                             </select>
                                         </div>
-                                        <div className="col-6">
+                                        <div className="col-12 col-sm-6">
                                             <label htmlFor="producto-edad" className="form-label text-muted small fw-semibold">Edad recomendada</label>
                                             <input
                                                 id="producto-edad"
@@ -653,7 +653,7 @@ const Admin = () => {
                                     Podrás volver a activarlo cuando quieras.
                                 </p>
                                 {errorAccion && <div role="alert" className="alert alert-danger">{errorAccion}</div>}
-                                <div className="d-flex gap-2 justify-content-center">
+                                <div className="d-flex flex-wrap gap-2 justify-content-center">
                                     <button
                                         type="button"
                                         className="btn btn-light rounded-3 px-4"
@@ -692,7 +692,7 @@ const Admin = () => {
                                     {errorAccion && <div role="alert" className="alert alert-danger">{errorAccion}</div>}
 
                                     <div className="row g-2 mb-3">
-                                        <div className="col-6">
+                                        <div className="col-12 col-sm-6">
                                             <label htmlFor="usuario-nombre" className="form-label text-muted small fw-semibold">Nombre</label>
                                             <input
                                                 id="usuario-nombre"
@@ -703,7 +703,7 @@ const Admin = () => {
                                                 required
                                             />
                                         </div>
-                                        <div className="col-6">
+                                        <div className="col-12 col-sm-6">
                                             <label htmlFor="usuario-apellido" className="form-label text-muted small fw-semibold">Apellido</label>
                                             <input
                                                 id="usuario-apellido"
