@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
+import DashboardGraficos from '../components/DashboardGraficos';
 import { obtenerMensajeError } from '../services/api.client';
 import CategoriaService from '../services/categoria.service';
 import PedidoService, { type Pedido } from '../services/pedido.service';
@@ -318,32 +319,35 @@ const Admin = () => {
             )}
 
             {!cargando && !errorCarga && pestania === 'dashboard' && (
-                <div className="row g-4">
-                    <div className="col-12 col-sm-6 col-lg-3">
-                        <div className="card border-0 shadow-sm p-3 rounded-4 bg-white">
-                            <span className="text-muted small fw-semibold">Ventas Totales</span>
-                            <p className="fs-3 fw-bold mt-2 mb-0 text-success">${ventasTotales.toLocaleString('es-CL')}</p>
+                <>
+                    <div className="row g-4">
+                        <div className="col-12 col-sm-6 col-lg-3">
+                            <div className="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                                <span className="text-muted small fw-semibold">Ventas Totales</span>
+                                <p className="fs-3 fw-bold mt-2 mb-0 text-success">${ventasTotales.toLocaleString('es-CL')}</p>
+                            </div>
+                        </div>
+                        <div className="col-12 col-sm-6 col-lg-3">
+                            <div className="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                                <span className="text-muted small fw-semibold">Pedidos Registrados</span>
+                                <p className="fs-3 fw-bold mt-2 mb-0" style={{ color: '#16498C' }}>{pedidos.length}</p>
+                            </div>
+                        </div>
+                        <div className="col-12 col-sm-6 col-lg-3">
+                            <div className="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                                <span className="text-muted small fw-semibold">Usuarios Registrados</span>
+                                <p className="fs-3 fw-bold mt-2 mb-0" style={{ color: '#16498C' }}>{usuarios.length}</p>
+                            </div>
+                        </div>
+                        <div className="col-12 col-sm-6 col-lg-3">
+                            <div className="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                                <span className="text-muted small fw-semibold">Productos con Stock Bajo</span>
+                                <p className="fs-3 fw-bold mt-2 mb-0 text-danger">{productosStockBajo}</p>
+                            </div>
                         </div>
                     </div>
-                    <div className="col-12 col-sm-6 col-lg-3">
-                        <div className="card border-0 shadow-sm p-3 rounded-4 bg-white">
-                            <span className="text-muted small fw-semibold">Pedidos Registrados</span>
-                            <p className="fs-3 fw-bold mt-2 mb-0" style={{ color: '#16498C' }}>{pedidos.length}</p>
-                        </div>
-                    </div>
-                    <div className="col-12 col-sm-6 col-lg-3">
-                        <div className="card border-0 shadow-sm p-3 rounded-4 bg-white">
-                            <span className="text-muted small fw-semibold">Usuarios Registrados</span>
-                            <p className="fs-3 fw-bold mt-2 mb-0" style={{ color: '#16498C' }}>{usuarios.length}</p>
-                        </div>
-                    </div>
-                    <div className="col-12 col-sm-6 col-lg-3">
-                        <div className="card border-0 shadow-sm p-3 rounded-4 bg-white">
-                            <span className="text-muted small fw-semibold">Productos con Stock Bajo</span>
-                            <p className="fs-3 fw-bold mt-2 mb-0 text-danger">{productosStockBajo}</p>
-                        </div>
-                    </div>
-                </div>
+                    <DashboardGraficos pedidos={pedidos} productos={productos} />
+                </>
             )}
 
             {!cargando && !errorCarga && pestania === 'productos' && (
