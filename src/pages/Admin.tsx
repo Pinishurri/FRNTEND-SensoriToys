@@ -594,14 +594,21 @@ const Admin = () => {
                                         </div>
                                     </div>
                                     <div className="mb-3">
-                                        <label htmlFor="producto-imagen" className="form-label text-muted small fw-semibold">URL de la imagen</label>
+                                        <label htmlFor="producto-imagen" className="form-label fw-bold">URL o Ruta de la Imagen</label>
                                         <input
                                             id="producto-imagen"
-                                            type="url"
+                                            type="text"
+                                            placeholder="Ej: /imagenes/mordedor-silicona.jpg"
                                             className="form-control rounded-3"
-                                            value={formularioProducto.imagenUrl}
-                                            onChange={(e) => setFormularioProducto({ ...formularioProducto, imagenUrl: e.target.value })}
+                                            value={formularioProducto.imagenUrl || ''}
+                                            onChange={(e) => setFormularioProducto({
+                                                ...formularioProducto,
+                                                imagenUrl: e.target.value
+                                            })}
                                         />
+                                        <small className="text-muted d-block mt-1">
+                                            Usa la ruta local (ej: <code>/imagenes/mordedor-silicona.jpg</code>) o un enlace web.
+                                        </small>
                                     </div>
 
                                     {productoEditando && (
