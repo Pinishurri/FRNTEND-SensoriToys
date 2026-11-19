@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router';
+import DetallePedidoModal from '../components/DetallePedidoModal';
 import { obtenerMensajeError } from '../services/api.client';
 import PedidoService, { type Pedido } from '../services/pedido.service';
 import ProductoService, { type Producto } from '../services/producto.service';
@@ -10,6 +11,7 @@ const Pedidos = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pedidoSeleccionado, setPedidoSeleccionado] = useState<Pedido | null>(null);
 
   const cargarPedidos = useCallback(async () => {
     const sesion = SesionService.obtener();
@@ -41,6 +43,13 @@ const Pedidos = () => {
   const nombreProducto = (productoId: number) =>
     productos.find((producto) => producto.id === productoId)?.nombre ?? `Producto #${productoId}`;
 
+  const cerrarDetalle = useCallback(() => setPedidoSeleccionado(null), []);
+
+  const resumenProductos = (pedido: Pedido) => {
+    const total = (pedido.detalles ?? []).reduce((suma, detalle) => suma + detalle.cantidad, 0);
+    return `${total} ${total === 1 ? 'producto' : 'productos'} en este pedido`;
+  };
+
   return (
     <div className="contenedor">
       <h1 className="titulo-pagina">Mis pedidos</h1>
@@ -68,26 +77,41 @@ const Pedidos = () => {
         <ul className="row g-4 list-unstyled">
           {pedidos.map((pedido) => (
             <li key={pedido.id} className="col-12 col-md-6 col-lg-4">
-              <div className="tarjeta h-100">
+              <div
+                className="tarjeta h-100 d-flex flex-column gap-2"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setPedidoSeleccionado(pedido)}
+              >
                 <div className="pedido-cabecera">
                   <h2>Pedido #{pedido.id}</h2>
                   <span className="texto-suave">
                     {new Date(pedido.fechaCreacion).toLocaleDateString('es-CL')}
                   </span>
                 </div>
-                <ul className="pedido-detalle">
-                  {(pedido.detalles ?? []).map((detalle) => (
-                    <li key={detalle.id}>
-                      {detalle.cantidad} × {nombreProducto(detalle.productoId)} — $
-                      {detalle.precioUnitario.toLocaleString('es-CL')} c/u
-                    </li>
-                  ))}
-                </ul>
-                <p className="precio">Total: ${pedido.total.toLocaleString('es-CL')}</p>
+                <p className="texto-suave mb-0">{resumenProductos(pedido)}</p>
+                <p className="precio mb-0">Total: ${pedido.total.toLocaleString('es-CL')}</p>
+                <button
+                  type="button"
+                  className="boton boton-borde mt-auto"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setPedidoSeleccionado(pedido);
+                  }}
+                >
+                  Ver detalle<span className="visually-hidden"> del pedido #{pedido.id}</span>
+                </button>
               </div>
             </li>
           ))}
         </ul>
+      )}
+
+      {pedidoSeleccionado && (
+        <DetallePedidoModal
+          pedido={pedidoSeleccionado}
+          nombreProducto={nombreProducto}
+          onCerrar={cerrarDetalle}
+        />
       )}
     </div>
   );

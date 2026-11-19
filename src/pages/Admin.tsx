@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
 import DashboardGraficos from '../components/DashboardGraficos';
+import DetallePedidoModal from '../components/DetallePedidoModal';
 import { obtenerMensajeError } from '../services/api.client';
 import CategoriaService from '../services/categoria.service';
 import PedidoService, { type Pedido } from '../services/pedido.service';
@@ -60,6 +61,7 @@ const Admin = () => {
     const [categorias, setCategorias] = useState<Categoria[]>([]);
     const [usuarios, setUsuarios] = useState<Usuario[]>([]);
     const [pedidos, setPedidos] = useState<Pedido[]>([]);
+    const [pedidoSeleccionado, setPedidoSeleccionado] = useState<Pedido | null>(null);
 
     const [cargando, setCargando] = useState(true);
     const [errorCarga, setErrorCarga] = useState<string | null>(null);
@@ -114,6 +116,13 @@ const Admin = () => {
 
     const nombreProducto = (productoId: number) =>
         productos.find((p) => p.id === productoId)?.nombre ?? `Producto #${productoId}`;
+
+    const cerrarDetallePedido = useCallback(() => setPedidoSeleccionado(null), []);
+
+    const resumenProductos = (pedido: Pedido) => {
+        const total = (pedido.detalles ?? []).reduce((suma, detalle) => suma + detalle.cantidad, 0);
+        return `${total} ${total === 1 ? 'producto' : 'productos'}`;
+    };
 
     const ventasTotales = pedidos.reduce((suma, pedido) => suma + pedido.total, 0);
     const productosStockBajo = productos.filter((p) => p.activo !== false && p.stock <= STOCK_BAJO).length;
@@ -433,14 +442,28 @@ const Admin = () => {
                             </thead>
                             <tbody>
                                 {[...pedidos].sort((a, b) => b.id - a.id).map((pedido) => (
-                                    <tr key={pedido.id}>
+                                    <tr
+                                        key={pedido.id}
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={() => setPedidoSeleccionado(pedido)}
+                                    >
                                         <td data-label="ID Pedido" className="fw-bold">#{pedido.id}</td>
                                         <td data-label="Fecha">{new Date(pedido.fechaCreacion).toLocaleDateString('es-CL')}</td>
                                         <td data-label="Cliente">{nombreCliente(pedido.usuarioId)}</td>
                                         <td data-label="Detalle">
-                                            {(pedido.detalles ?? [])
-                                                .map((d) => `${d.cantidad} × ${nombreProducto(d.productoId)}`)
-                                                .join(', ')}
+                                            <div className="d-flex flex-wrap align-items-center justify-content-end justify-content-md-start gap-2">
+                                                <span style={{ minWidth: '7.5rem' }}>{resumenProductos(pedido)}</span>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-outline-primary"
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+                                                        setPedidoSeleccionado(pedido);
+                                                    }}
+                                                >
+                                                    Ver detalle<span className="visually-hidden"> del pedido #{pedido.id}</span>
+                                                </button>
+                                            </div>
                                         </td>
                                         <td data-label="Total" className="fw-bold" style={{ color: '#16498C' }}>
                                             ${pedido.total.toLocaleString('es-CL')}
@@ -502,6 +525,15 @@ const Admin = () => {
                         </table>
                     </div>
                 </div>
+            )}
+
+            {pedidoSeleccionado && (
+                <DetallePedidoModal
+                    pedido={pedidoSeleccionado}
+                    cliente={nombreCliente(pedidoSeleccionado.usuarioId)}
+                    nombreProducto={nombreProducto}
+                    onCerrar={cerrarDetallePedido}
+                />
             )}
 
             {mostrarModalProducto && (
