@@ -65,6 +65,11 @@ export const UsuarioService = {
     return data;
   },
 
+  async asignarRol(id: number, rol: RolSesion): Promise<Usuario> {
+    const { data } = await apiClient.put<Usuario>(`${resource}/${id}/rol`, null, { params: { rol } });
+    return data;
+  },
+
   async desactivar(id: number): Promise<void> {
     await apiClient.delete(`${resource}/${id}`);
   },

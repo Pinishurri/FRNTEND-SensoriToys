@@ -18,6 +18,7 @@ import type { Producto } from '../services/producto.service';
 interface Props {
     pedidos: Pedido[];
     productos: Producto[];
+    tipo: 'mensual' | 'categoria' | 'productos';
 }
 
 interface VentaPorMes {
@@ -65,7 +66,7 @@ const etiquetaMes = (clave: string) => {
     }).format(new Date(Date.UTC(anio, mes - 1, 1)));
 };
 
-const DashboardGraficos = ({ pedidos, productos }: Props) => {
+const DashboardGraficos = ({ pedidos, productos, tipo }: Props) => {
     const ventasPorMes = useMemo<VentaPorMes[]>(() => {
         const totales = new Map<string, number>();
 
@@ -127,7 +128,7 @@ const DashboardGraficos = ({ pedidos, productos }: Props) => {
 
     return (
         <div className="row g-4 mt-1">
-            <div className="col-12 col-xl-6">
+            {tipo === 'mensual' && <div className="col-12 col-xl-6">
                 <section className="card border-0 shadow-sm rounded-4 bg-white p-3 p-md-4 h-100">
                     <h2 className="fs-5 fw-bold text-dark mb-1">Ventas por mes</h2>
                     <p className="small text-muted mb-3">Ingresos generados según la fecha de cada pedido.</p>
@@ -147,9 +148,9 @@ const DashboardGraficos = ({ pedidos, productos }: Props) => {
                         </div>
                     )}
                 </section>
-            </div>
+            </div>}
 
-            <div className="col-12 col-xl-6">
+            {tipo === 'categoria' && <div className="col-12 col-xl-6">
                 <section className="card border-0 shadow-sm rounded-4 bg-white p-3 p-md-4 h-100">
                     <h2 className="fs-5 fw-bold text-dark mb-1">Ventas por categoría</h2>
                     <p className="small text-muted mb-3">Distribución de ingresos según la categoría de los juguetes.</p>
@@ -183,9 +184,9 @@ const DashboardGraficos = ({ pedidos, productos }: Props) => {
                         </div>
                     )}
                 </section>
-            </div>
+            </div>}
 
-            <div className="col-12">
+            {tipo === 'productos' && <div className="col-12">
                 <section className="card border-0 shadow-sm rounded-4 bg-white p-3 p-md-4">
                     <h2 className="fs-5 fw-bold text-dark mb-1">Productos más vendidos</h2>
                     <p className="small text-muted mb-3">Top 8 de juguetes según las unidades incluidas en los pedidos.</p>
@@ -209,7 +210,7 @@ const DashboardGraficos = ({ pedidos, productos }: Props) => {
                         </div>
                     )}
                 </section>
-            </div>
+            </div>}
         </div>
     );
 };

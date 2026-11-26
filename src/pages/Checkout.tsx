@@ -237,8 +237,12 @@ const Checkout = () => {
                                     placeholder="XXXX XXXX XXXX XXXX"
                                     required
                                     maxLength={16}
+                                    inputMode="numeric"
+                                    autoComplete="cc-number"
+                                    pattern="[0-9]{13,16}"
+                                    title="Ingresa entre 13 y 16 dígitos, sin espacios ni letras."
                                     value={formData.tarjeta}
-                                    onChange={e => setFormData({ ...formData, tarjeta: e.target.value })}
+                                    onChange={e => setFormData({ ...formData, tarjeta: e.target.value.replace(/\D/g, '').slice(0, 16) })}
                                 />
                             </div>
                         </div>

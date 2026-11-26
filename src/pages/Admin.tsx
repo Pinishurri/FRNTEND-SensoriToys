@@ -11,6 +11,7 @@ import ProductoService, {
     type ProductoPayload
 } from '../services/producto.service';
 import UsuarioService, { type Usuario } from '../services/usuario.service';
+import SesionService from '../services/sesion.service';
 
 type Pestania = 'dashboard' | 'productos' | 'pedidos' | 'usuarios';
 
@@ -29,6 +30,7 @@ interface FormularioUsuario {
     apellido: string;
     email: string;
     activo: boolean;
+    rol: 'ADMIN' | 'CLIENTE';
 }
 
 const STOCK_BAJO = 5;
@@ -55,7 +57,13 @@ const aPayload = (producto: Producto, activo: boolean): ProductoPayload => ({
 });
 
 const Admin = () => {
+    const sesionActual = SesionService.obtener();
     const [pestania, setPestania] = useState<Pestania>('dashboard');
+    const [filtroTexto, setFiltroTexto] = useState('');
+    const [filtroCategoria, setFiltroCategoria] = useState('');
+    const [filtroEstado, setFiltroEstado] = useState('todos');
+    const [filtroStock, setFiltroStock] = useState('todos');
+    const [graficoActivo, setGraficoActivo] = useState<'mensual' | 'categoria' | 'productos' | null>(null);
 
     const [productos, setProductos] = useState<Producto[]>([]);
     const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -78,7 +86,8 @@ const Admin = () => {
         nombre: '',
         apellido: '',
         email: '',
-        activo: true
+        activo: true,
+        rol: 'CLIENTE'
     });
 
     const cargarDatos = useCallback(async () => {
@@ -126,6 +135,13 @@ const Admin = () => {
 
     const ventasTotales = pedidos.reduce((suma, pedido) => suma + pedido.total, 0);
     const productosStockBajo = productos.filter((p) => p.activo !== false && p.stock <= STOCK_BAJO).length;
+    const productosFiltrados = productos.filter((p) => {
+        const consulta = filtroTexto.trim().toLocaleLowerCase('es-CL');
+        return (!consulta || p.nombre.toLocaleLowerCase('es-CL').includes(consulta))
+            && (!filtroCategoria || String(p.categoria?.id ?? '') === filtroCategoria)
+            && (filtroEstado === 'todos' || (filtroEstado === 'activos' ? p.activo !== false : p.activo === false))
+            && (filtroStock === 'todos' || (filtroStock === 'bajo' ? p.stock <= STOCK_BAJO : p.stock > STOCK_BAJO));
+    });
 
     const abrirCrearProducto = () => {
         setProductoEditando(null);
@@ -226,7 +242,8 @@ const Admin = () => {
             nombre: usuario.nombre,
             apellido: usuario.apellido ?? '',
             email: usuario.email,
-            activo: usuario.estado === 'ACTIVO'
+            activo: usuario.estado === 'ACTIVO',
+            rol: usuario.rol === 'ADMIN' ? 'ADMIN' : 'CLIENTE'
         });
         setErrorAccion(null);
     };
@@ -250,6 +267,10 @@ const Admin = () => {
                 direccionEnvio: usuarioEditando.direccionEnvio,
                 referenciaPago: usuarioEditando.referenciaPago
             });
+
+            if (usuarioEditando.id !== sesionActual?.id && formularioUsuario.rol !== usuarioEditando.rol) {
+                await UsuarioService.asignarRol(usuarioEditando.id, formularioUsuario.rol);
+            }
 
             if (usuarioEditando.rol !== 'ADMIN') {
                 const estabaActivo = usuarioEditando.estado === 'ACTIVO';
@@ -355,7 +376,12 @@ const Admin = () => {
                             </div>
                         </div>
                     </div>
-                    <DashboardGraficos pedidos={pedidos} productos={productos} />
+                    <div className="d-flex flex-wrap gap-2 mt-4" aria-label="Gráficos de ventas">
+                        <button type="button" className={`btn rounded-pill ${graficoActivo === 'mensual' ? 'btn-primary' : 'btn-outline-primary'}`} onClick={() => setGraficoActivo(graficoActivo === 'mensual' ? null : 'mensual')}>Ventas del mes</button>
+                        <button type="button" className={`btn rounded-pill ${graficoActivo === 'categoria' ? 'btn-primary' : 'btn-outline-primary'}`} onClick={() => setGraficoActivo(graficoActivo === 'categoria' ? null : 'categoria')}>Ventas por categoría</button>
+                        <button type="button" className={`btn rounded-pill ${graficoActivo === 'productos' ? 'btn-primary' : 'btn-outline-primary'}`} onClick={() => setGraficoActivo(graficoActivo === 'productos' ? null : 'productos')}>Productos más vendidos</button>
+                    </div>
+                    {graficoActivo && <DashboardGraficos pedidos={pedidos} productos={productos} tipo={graficoActivo} />}
                 </>
             )}
 
@@ -372,6 +398,12 @@ const Admin = () => {
                             + Nuevo Producto
                         </button>
                     </div>
+                    <div className="row g-2 mb-3">
+                        <div className="col-12 col-md-4"><label className="form-label small" htmlFor="filtro-producto">Buscar producto</label><input id="filtro-producto" className="form-control" value={filtroTexto} onChange={(e) => setFiltroTexto(e.target.value)} placeholder="Nombre del producto" /></div>
+                        <div className="col-12 col-md-3"><label className="form-label small" htmlFor="filtro-categoria">Categoría</label><select id="filtro-categoria" className="form-select" value={filtroCategoria} onChange={(e) => setFiltroCategoria(e.target.value)}><option value="">Todas</option>{categorias.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}</select></div>
+                        <div className="col-6 col-md-2"><label className="form-label small" htmlFor="filtro-estado">Estado</label><select id="filtro-estado" className="form-select" value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)}><option value="todos">Todos</option><option value="activos">Activos</option><option value="inactivos">Desactivados</option></select></div>
+                        <div className="col-6 col-md-3"><label className="form-label small" htmlFor="filtro-stock">Stock</label><select id="filtro-stock" className="form-select" value={filtroStock} onChange={(e) => setFiltroStock(e.target.value)}><option value="todos">Cualquier stock</option><option value="bajo">Stock bajo (≤ {STOCK_BAJO})</option><option value="normal">Stock normal</option></select></div>
+                    </div>
                     <div className="table-responsive">
                         <table className="table align-middle tabla-apilable">
                             <thead>
@@ -387,7 +419,7 @@ const Admin = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {productos.map((p) => (
+                                {productosFiltrados.map((p) => (
                                     <tr key={p.id}>
                                         <td data-label="ID">{p.id}</td>
                                         <td data-label="Nombre" className="fw-bold">{p.nombre}</td>
@@ -415,9 +447,9 @@ const Admin = () => {
                                         </td>
                                     </tr>
                                 ))}
-                                {productos.length === 0 && (
+                                {productosFiltrados.length === 0 && (
                                     <tr>
-                                        <td colSpan={8} className="text-center py-4 text-muted">No hay productos registrados.</td>
+                                        <td colSpan={8} className="text-center py-4 text-muted">{productos.length === 0 ? 'No hay productos registrados.' : 'No hay productos que coincidan con los filtros.'}</td>
                                     </tr>
                                 )}
                             </tbody>
@@ -643,6 +675,24 @@ const Admin = () => {
                                         </small>
                                     </div>
 
+                                    <div className="mb-3">
+                                        <label className="form-label fw-bold d-block">Imagen desde archivo</label>
+                                        <input id="producto-archivo" type="file" accept="image/*" className="visually-hidden" onChange={(e) => {
+                                            const archivo = e.target.files?.[0];
+                                            if (!archivo) return;
+                                            if (archivo.size > 700_000) {
+                                                setErrorAccion('La imagen debe pesar menos de 700 KB.');
+                                                e.target.value = '';
+                                                return;
+                                            }
+                                            const lector = new FileReader();
+                                            lector.onload = () => setFormularioProducto((actual) => ({ ...actual, imagenUrl: String(lector.result ?? '') }));
+                                            lector.readAsDataURL(archivo);
+                                        }} />
+                                        <button type="button" className="btn btn-outline-primary" onClick={() => document.getElementById('producto-archivo')?.click()}>File selector - Button</button>
+                                        <span className="small text-muted ms-2">{formularioProducto.imagenUrl.startsWith('data:') ? 'Archivo seleccionado' : 'Elige una imagen de hasta 700 KB.'}</span>
+                                    </div>
+
                                     {productoEditando && (
                                         <div className="border-top pt-3 mt-3">
                                             {productoEditando.activo !== false ? (
@@ -768,6 +818,15 @@ const Admin = () => {
                                             required
                                         />
                                     </div>
+
+                                    {usuarioEditando.id !== sesionActual?.id && (
+                                        <div className="mb-3">
+                                            <label htmlFor="usuario-rol" className="form-label fw-bold">Rol</label>
+                                            <select id="usuario-rol" className="form-select" value={formularioUsuario.rol} onChange={(e) => setFormularioUsuario({ ...formularioUsuario, rol: e.target.value as 'ADMIN' | 'CLIENTE' })}>
+                                                <option value="CLIENTE">Cliente</option><option value="ADMIN">Administrador</option>
+                                            </select>
+                                        </div>
+                                    )}
 
                                     {usuarioEditando.rol === 'ADMIN' ? (
                                         <div className="alert alert-info border-0 rounded-3 text-muted small mt-4 mb-2" role="note">
