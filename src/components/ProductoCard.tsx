@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { useCart } from '../context/CartContext';
 import type { Producto } from '../services/producto.service';
+import { resolverImagen } from '../assets/imagenes';
 
 interface ProductoCardProps {
   producto: Producto;
@@ -31,7 +32,7 @@ const ProductoCard = ({ producto }: ProductoCardProps) => {
     <article className="tarjeta-producto">
       <Link to={`/producto/${producto.id}`} className="tarjeta-imagen" tabIndex={-1} aria-hidden="true">
         {producto.imagenUrl ? (
-          <img src={producto.imagenUrl} alt="" loading="lazy" />
+          <img src={resolverImagen(producto.imagenUrl)} alt="" loading="lazy" />
         ) : (
           <span className="sin-imagen">Sin imagen</span>
         )}

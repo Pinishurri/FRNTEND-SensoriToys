@@ -4,6 +4,8 @@ import { useCart } from '../context/CartContext';
 import { obtenerMensajeError } from '../services/api.client';
 import PedidoService from '../services/pedido.service';
 import SesionService from '../services/sesion.service';
+import { resolverImagen } from '../assets/imagenes';
+import { ciudadesDeRegion, REGIONES_CHILE } from '../data/regionesChile';
 
 interface OrderSuccessData {
     id: string;
@@ -11,29 +13,7 @@ interface OrderSuccessData {
     direccion: string;
 }
 
-const COMUNAS_CHILE = [
-    'Concepción',
-    'Hualpén',
-    'Talcahuano',
-    'San Pedro de la Paz',
-    'Chiguayante',
-    'Providencia',
-    'Santiago Centro',
-    'Las Condes',
-    'Viña del Mar',
-    'Valparaíso'
-];
-
-const CIUDADES_CHILE = [
-    'Concepción',
-    'Santiago',
-    'Valparaíso',
-    'Antofagasta',
-    'La Serena',
-    'Temuco',
-    'Puerto Montt'
-];
-
+const FORMATO_COMUNA = /^[\p{L}][\p{L}\s'.-]*$/u;
 const Checkout = () => {
     const { cart, clearCart, total } = useCart() as any;
     const navigate = useNavigate();
@@ -48,8 +28,9 @@ const Checkout = () => {
         apellido: '',
         calle: '',
         numero: '',
-        comuna: '',
+        region: '',
         ciudad: '',
+        comuna: '',
         deptoOficina: '',
         infoAdicional: '',
         tarjeta: ''
@@ -65,7 +46,13 @@ const Checkout = () => {
         const sesion = SesionService.obtener();
         if (!sesion) return;
 
-        const direccionEnvioCompleta = `${formData.calle} #${formData.numero}${formData.deptoOficina ? ', Depto/Of: ' + formData.deptoOficina : ''}, ${formData.comuna}, ${formData.ciudad}`;
+        const comuna = formData.comuna.trim();
+        if (!FORMATO_COMUNA.test(comuna) || comuna.length > 50) {
+            setErrorPedido('Ingresa una comuna válida, solo con letras (máximo 50 caracteres).');
+            return;
+        }
+
+        const direccionEnvioCompleta = `${formData.calle} #${formData.numero}${formData.deptoOficina ? ', Casa/Depto/Of: ' + formData.deptoOficina : ''}, ${comuna}, ${formData.ciudad}, ${formData.region}`;
 
         setEnviando(true);
         setErrorPedido(null);
@@ -170,19 +157,18 @@ const Checkout = () => {
                                 </div>
                             </div>
 
-                            {/* MENÚS DESPLEGABLES DE COMUNA Y CIUDAD */}
                             <div className="row g-3 mb-3">
                                 <div className="col-12 col-md-6">
-                                    <label className="form-label text-muted small fw-semibold">Comuna*</label>
+                                    <label className="form-label text-muted small fw-semibold">Región*</label>
                                     <select
                                         className="form-select rounded-3"
                                         required
-                                        value={formData.comuna}
-                                        onChange={e => setFormData({ ...formData, comuna: e.target.value })}
+                                        value={formData.region}
+                                        onChange={e => setFormData({ ...formData, region: e.target.value, ciudad: '' })}
                                     >
-                                        <option value="">Seleccionar comuna</option>
-                                        {COMUNAS_CHILE.map(c => (
-                                            <option key={c} value={c}>{c}</option>
+                                        <option value="">Seleccionar región</option>
+                                        {REGIONES_CHILE.map(r => (
+                                            <option key={r.nombre} value={r.nombre}>{r.nombre}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -191,24 +177,37 @@ const Checkout = () => {
                                     <select
                                         className="form-select rounded-3"
                                         required
+                                        disabled={!formData.region}
                                         value={formData.ciudad}
                                         onChange={e => setFormData({ ...formData, ciudad: e.target.value })}
                                     >
-                                        <option value="">Seleccionar ciudad</option>
-                                        {CIUDADES_CHILE.map(c => (
+                                        <option value="">{formData.region ? 'Seleccionar ciudad' : 'Primero elige una región'}</option>
+                                        {ciudadesDeRegion(formData.region).map(c => (
                                             <option key={c} value={c}>{c}</option>
                                         ))}
                                     </select>
+                                </div>
+                                <div className="col-12">
+                                    <label className="form-label text-muted small fw-semibold">Comuna*</label>
+                                    <input
+                                        type="text"
+                                        className="form-control rounded-3"
+                                        placeholder="Ej: Hualpén"
+                                        maxLength={50}
+                                        required
+                                        value={formData.comuna}
+                                        onChange={e => setFormData({ ...formData, comuna: e.target.value })}
+                                    />
                                 </div>
                             </div>
 
                             <div className="row g-3">
                                 <div className="col-12 col-md-6">
-                                    <label className="form-label text-muted small fw-semibold">Depto / Oficina / Nº Casa</label>
+                                    <label className="form-label text-muted small fw-semibold">Casa / Depto / Oficina</label>
                                     <input
                                         type="text"
                                         className="form-control rounded-3"
-                                        placeholder="Ej: Oficina 456"
+                                        placeholder="Ej: Casa B, Depto 45 u Oficina 456"
                                         value={formData.deptoOficina}
                                         onChange={e => setFormData({ ...formData, deptoOficina: e.target.value })}
                                     />
@@ -276,7 +275,7 @@ const Checkout = () => {
                                     <div key={item.id} className="d-flex align-items-center justify-content-between py-2 border-bottom">
                                         <div className="d-flex align-items-center me-2">
                                             <img
-                                                src={item.imagenUrl || item.img || 'https://via.placeholder.com/50'}
+                                                src={resolverImagen(item.imagenUrl || item.img) || 'https://via.placeholder.com/50'}
                                                 alt={item.nombre || item.name}
                                                 className="rounded-2 me-2"
                                                 style={{ width: '45px', height: '45px', objectFit: 'cover' }}

@@ -8,6 +8,7 @@ const Register = () => {
 
   const [nombre, setNombre] = useState('');
   const [apellido, setApellido] = useState('');
+  const [segundoApellido, setSegundoApellido] = useState('');
   const [email, setEmail] = useState('');
   const [contrasenia, setContrasenia] = useState('');
   const [confirmacion, setConfirmacion] = useState('');
@@ -25,7 +26,7 @@ const Register = () => {
 
     setEnviando(true);
     try {
-      await UsuarioService.registrar({ nombre: nombre.trim(), apellido: apellido.trim(), email: email.trim(), contrasenia });
+      await UsuarioService.registrar({ nombre: nombre.trim(), apellido: apellido.trim(), segundoApellido: segundoApellido.trim(), email: email.trim(), contrasenia });
       navigate('/login', { state: { mensaje: 'Tu cuenta fue creada. Ya puedes iniciar sesión.' } });
     } catch (err) {
       setError(obtenerMensajeError(err, 'No se pudo conectar con el servidor. Inténtalo nuevamente.'));
@@ -57,9 +58,14 @@ const Register = () => {
                 />
               </div>
 
-              <div className="campo col-12">
-                <label htmlFor="apellido">Apellidos</label>
+              <div className="campo col-12 col-md-6">
+                <label htmlFor="apellido">Primer apellido</label>
                 <input id="apellido" name="apellido" type="text" autoComplete="family-name" value={apellido} onChange={(event) => setApellido(event.target.value)} required />
+              </div>
+
+              <div className="campo col-12 col-md-6">
+                <label htmlFor="segundo-apellido">Segundo apellido (opcional)</label>
+                <input id="segundo-apellido" name="segundoApellido" type="text" value={segundoApellido} onChange={(event) => setSegundoApellido(event.target.value)} />
               </div>
 
               <div className="campo col-12">

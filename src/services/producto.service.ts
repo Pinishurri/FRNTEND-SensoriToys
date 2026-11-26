@@ -50,6 +50,15 @@ export const ProductoService = {
 
   async eliminar(id: number): Promise<void> {
     await apiClient.delete(`${resource}/${id}`);
+  },
+
+  async subirImagen(archivo: File): Promise<string> {
+    const formulario = new FormData();
+    formulario.append('archivo', archivo);
+    const { data } = await apiClient.post<{ url: string }>(`${resource}/imagen`, formulario, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return data.url;
   }
 };
 

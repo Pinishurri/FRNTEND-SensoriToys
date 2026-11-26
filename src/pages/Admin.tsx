@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { Link } from 'react-router';
 import DashboardGraficos from '../components/DashboardGraficos';
 import DetallePedidoModal from '../components/DetallePedidoModal';
-import { obtenerMensajeError } from '../services/api.client';
+import { resolverImagen } from '../assets/imagenes';
+import { obtenerMensajeError, obtenerMensajeErrorDetallado } from '../services/api.client';
 import CategoriaService from '../services/categoria.service';
 import PedidoService, { type Pedido } from '../services/pedido.service';
 import ProductoService, {
@@ -18,8 +19,8 @@ type Pestania = 'dashboard' | 'productos' | 'pedidos' | 'usuarios';
 interface FormularioProducto {
     nombre: string;
     descripcion: string;
-    precio: number;
-    stock: number;
+    precio: string;
+    stock: string;
     categoriaId: string;
     edad: string;
     imagenUrl: string;
@@ -38,12 +39,14 @@ const STOCK_BAJO = 5;
 const formularioProductoVacio: FormularioProducto = {
     nombre: '',
     descripcion: '',
-    precio: 0,
-    stock: 0,
+    precio: '',
+    stock: '',
     categoriaId: '',
     edad: '',
     imagenUrl: ''
 };
+
+const soloDigitos = (valor: string): string => valor.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
 
 const aPayload = (producto: Producto, activo: boolean): ProductoPayload => ({
     nombre: producto.nombre,
@@ -75,6 +78,7 @@ const Admin = () => {
     const [errorCarga, setErrorCarga] = useState<string | null>(null);
     const [errorAccion, setErrorAccion] = useState<string | null>(null);
     const [guardando, setGuardando] = useState(false);
+    const [subiendoImagen, setSubiendoImagen] = useState(false);
 
     const [mostrarModalProducto, setMostrarModalProducto] = useState(false);
     const [productoEditando, setProductoEditando] = useState<Producto | null>(null);
@@ -155,8 +159,8 @@ const Admin = () => {
         setFormularioProducto({
             nombre: producto.nombre,
             descripcion: producto.descripcion ?? '',
-            precio: producto.precio,
-            stock: producto.stock,
+            precio: String(producto.precio),
+            stock: String(producto.stock),
             categoriaId: producto.categoria ? String(producto.categoria.id) : '',
             edad: producto.edad ?? '',
             imagenUrl: producto.imagenUrl ?? ''
@@ -179,12 +183,25 @@ const Admin = () => {
         setGuardando(true);
         setErrorAccion(null);
 
+        const precio = formularioProducto.precio === '' ? NaN : Number(formularioProducto.precio);
+        const stock = formularioProducto.stock === '' ? NaN : Number(formularioProducto.stock);
+        if (!Number.isSafeInteger(precio) || precio <= 0) {
+            setErrorAccion('El precio debe ser un número entero mayor a 0.');
+            setGuardando(false);
+            return;
+        }
+        if (!Number.isSafeInteger(stock) || stock < 0) {
+            setErrorAccion('El stock debe ser un número entero de 0 o más.');
+            setGuardando(false);
+            return;
+        }
+
         const categoria = categorias.find((c) => String(c.id) === formularioProducto.categoriaId) ?? null;
         const payload: ProductoPayload = {
             nombre: formularioProducto.nombre.trim(),
             descripcion: formularioProducto.descripcion.trim(),
-            precio: formularioProducto.precio,
-            stock: formularioProducto.stock,
+            precio,
+            stock,
             categoria,
             edad: formularioProducto.edad.trim() || undefined,
             imagenUrl: formularioProducto.imagenUrl.trim() || undefined,
@@ -203,6 +220,32 @@ const Admin = () => {
             setErrorAccion(obtenerMensajeError(error, 'No se pudo guardar el producto.'));
         } finally {
             setGuardando(false);
+        }
+    };
+
+    const handleSeleccionarImagen = async (event: ChangeEvent<HTMLInputElement>) => {
+        const archivo = event.target.files?.[0];
+        event.target.value = '';
+        if (!archivo) return;
+
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(archivo.type)) {
+            setErrorAccion('La imagen debe ser JPG, PNG o WEBP.');
+            return;
+        }
+        if (archivo.size > 5 * 1024 * 1024) {
+            setErrorAccion('La imagen no puede pesar más de 5 MB.');
+            return;
+        }
+
+        setSubiendoImagen(true);
+        setErrorAccion(null);
+        try {
+            const url = await ProductoService.subirImagen(archivo);
+            setFormularioProducto((actual) => ({ ...actual, imagenUrl: url }));
+        } catch (error) {
+            setErrorAccion(obtenerMensajeErrorDetallado(error, 'No se pudo subir la imagen.'));
+        } finally {
+            setSubiendoImagen(false);
         }
     };
 
@@ -608,11 +651,12 @@ const Admin = () => {
                                             <label htmlFor="producto-precio" className="form-label text-muted small fw-semibold">Precio ($)</label>
                                             <input
                                                 id="producto-precio"
-                                                type="number"
-                                                min={1}
+                                                type="text"
+                                                inputMode="numeric"
+                                                placeholder="Ej: 6990"
                                                 className="form-control rounded-3"
                                                 value={formularioProducto.precio}
-                                                onChange={(e) => setFormularioProducto({ ...formularioProducto, precio: Number(e.target.value) })}
+                                                onChange={(e) => setFormularioProducto({ ...formularioProducto, precio: soloDigitos(e.target.value) })}
                                                 required
                                             />
                                         </div>
@@ -620,11 +664,12 @@ const Admin = () => {
                                             <label htmlFor="producto-stock" className="form-label text-muted small fw-semibold">Stock</label>
                                             <input
                                                 id="producto-stock"
-                                                type="number"
-                                                min={0}
+                                                type="text"
+                                                inputMode="numeric"
+                                                placeholder="Ej: 10"
                                                 className="form-control rounded-3"
                                                 value={formularioProducto.stock}
-                                                onChange={(e) => setFormularioProducto({ ...formularioProducto, stock: Number(e.target.value) })}
+                                                onChange={(e) => setFormularioProducto({ ...formularioProducto, stock: soloDigitos(e.target.value) })}
                                                 required
                                             />
                                         </div>
@@ -658,39 +703,42 @@ const Admin = () => {
                                         </div>
                                     </div>
                                     <div className="mb-3">
-                                        <label htmlFor="producto-imagen" className="form-label fw-bold">URL o Ruta de la Imagen</label>
+                                        <label htmlFor="producto-archivo" className="form-label fw-bold d-block">Imagen del producto</label>
+                                        {formularioProducto.imagenUrl && (
+                                            <img
+                                                src={resolverImagen(formularioProducto.imagenUrl)}
+                                                alt="Vista previa del producto"
+                                                className="d-block rounded-3 border mb-2"
+                                                style={{ maxWidth: '8rem', maxHeight: '8rem', objectFit: 'cover' }}
+                                            />
+                                        )}
                                         <input
-                                            id="producto-imagen"
-                                            type="text"
-                                            placeholder="Ej: /imagenes/mordedor-silicona.jpg"
-                                            className="form-control rounded-3"
-                                            value={formularioProducto.imagenUrl || ''}
-                                            onChange={(e) => setFormularioProducto({
-                                                ...formularioProducto,
-                                                imagenUrl: e.target.value
-                                            })}
+                                            id="producto-archivo"
+                                            type="file"
+                                            accept="image/jpeg,image/png,image/webp"
+                                            className="visually-hidden"
+                                            onChange={(e) => void handleSeleccionarImagen(e)}
                                         />
-                                        <small className="text-muted d-block mt-1">
-                                            Usa la ruta local (ej: <code>/imagenes/mordedor-silicona.jpg</code>) o un enlace web.
-                                        </small>
-                                    </div>
-
-                                    <div className="mb-3">
-                                        <label className="form-label fw-bold d-block">Imagen desde archivo</label>
-                                        <input id="producto-archivo" type="file" accept="image/*" className="visually-hidden" onChange={(e) => {
-                                            const archivo = e.target.files?.[0];
-                                            if (!archivo) return;
-                                            if (archivo.size > 700_000) {
-                                                setErrorAccion('La imagen debe pesar menos de 700 KB.');
-                                                e.target.value = '';
-                                                return;
-                                            }
-                                            const lector = new FileReader();
-                                            lector.onload = () => setFormularioProducto((actual) => ({ ...actual, imagenUrl: String(lector.result ?? '') }));
-                                            lector.readAsDataURL(archivo);
-                                        }} />
-                                        <button type="button" className="btn btn-outline-primary" onClick={() => document.getElementById('producto-archivo')?.click()}>File selector - Button</button>
-                                        <span className="small text-muted ms-2">{formularioProducto.imagenUrl.startsWith('data:') ? 'Archivo seleccionado' : 'Elige una imagen de hasta 700 KB.'}</span>
+                                        <div className="d-flex flex-wrap align-items-center gap-2">
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-primary"
+                                                disabled={subiendoImagen}
+                                                onClick={() => document.getElementById('producto-archivo')?.click()}
+                                            >
+                                                {subiendoImagen ? 'Subiendo…' : formularioProducto.imagenUrl ? 'Cambiar imagen' : 'Subir imagen'}
+                                            </button>
+                                            {formularioProducto.imagenUrl && !subiendoImagen && (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-link text-danger"
+                                                    onClick={() => setFormularioProducto({ ...formularioProducto, imagenUrl: '' })}
+                                                >
+                                                    Quitar imagen
+                                                </button>
+                                            )}
+                                        </div>
+                                        <small className="text-muted d-block mt-1">JPG, PNG o WEBP de hasta 5 MB.</small>
                                     </div>
 
                                     {productoEditando && (

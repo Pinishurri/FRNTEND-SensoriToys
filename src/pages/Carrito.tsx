@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useCart } from '../context/CartContext';
+import { resolverImagen } from '../assets/imagenes';
 
 const Carrito = () => {
   const { cart, updateQuantity, removeFromCart, clearCart, total } = useCart();
@@ -30,7 +31,7 @@ const Carrito = () => {
             {cart.map((item) => (
               <li key={item.id} className="item-carrito">
                 <div className="item-imagen">
-                  {item.imagenUrl ? <img src={item.imagenUrl} alt="" /> : <span className="sin-imagen">Sin imagen</span>}
+                  {item.imagenUrl ? <img src={resolverImagen(item.imagenUrl)} alt="" /> : <span className="sin-imagen">Sin imagen</span>}
                 </div>
 
                 <div className="item-info">

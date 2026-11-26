@@ -17,6 +17,7 @@ export interface LoginResponse {
 export interface RegistroPayload {
   nombre: string;
   apellido?: string;
+  segundoApellido?: string;
   email: string;
   contrasenia: string;
   direccionEnvio?: string;
@@ -27,8 +28,15 @@ export interface Usuario {
   id: number;
   nombre: string;
   apellido?: string;
+  segundoApellido?: string;
   email: string;
   direccionEnvio?: string;
+  calle?: string;
+  numero?: string;
+  deptoOficina?: string;
+  comuna?: string;
+  ciudad?: string;
+  region?: string;
   referenciaPago?: string;
   estado: 'ACTIVO' | 'INACTIVO';
   fechaCreacion?: string;
@@ -38,9 +46,21 @@ export interface Usuario {
 export interface UsuarioActualizarPayload {
   nombre: string;
   apellido?: string;
+  segundoApellido?: string;
   email: string;
   direccionEnvio?: string;
+  calle?: string;
+  numero?: string;
+  deptoOficina?: string;
+  comuna?: string;
+  ciudad?: string;
+  region?: string;
   referenciaPago?: string;
+}
+
+export interface CambiarContraseniaPayload {
+  contraseniaActual: string;
+  contraseniaNueva: string;
 }
 
 const resource = '/usuarios';
@@ -60,9 +80,18 @@ export const UsuarioService = {
     return Array.isArray(data) ? data : [];
   },
 
+  async obtener(id: number): Promise<Usuario> {
+    const { data } = await apiClient.get<Usuario>(`${resource}/${id}`);
+    return data;
+  },
+
   async actualizar(id: number, payload: UsuarioActualizarPayload): Promise<Usuario> {
     const { data } = await apiClient.put<Usuario>(`${resource}/${id}`, payload);
     return data;
+  },
+
+  async cambiarContrasenia(id: number, payload: CambiarContraseniaPayload): Promise<void> {
+    await apiClient.patch(`${resource}/${id}/contrasenia`, payload);
   },
 
   async asignarRol(id: number, rol: RolSesion): Promise<Usuario> {

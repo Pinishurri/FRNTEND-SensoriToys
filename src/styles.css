@@ -72,7 +72,8 @@ a {
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
-select:focus-visible {
+select:focus-visible,
+textarea:focus-visible {
   outline: 3px solid var(--tinta);
   outline-offset: 2px;
 }
@@ -599,6 +600,7 @@ select:focus-visible {
 .campo {
   display: grid;
   gap: 0.35rem;
+  min-width: 0;
 }
 
 .campo label {
@@ -614,6 +616,48 @@ select:focus-visible {
   font: 400 1rem Inter, system-ui, sans-serif;
   color: var(--tinta);
   background: #fff;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+  min-width: 0;
+}
+
+.campo select,
+.campo textarea {
+  min-height: 44px;
+  padding: 0.6rem 0.9rem;
+  border: 2px solid var(--borde);
+  border-radius: 10px;
+  font: 400 1rem Inter, system-ui, sans-serif;
+  color: var(--tinta);
+  background: #fff;
+}
+
+.campo textarea {
+  resize: vertical;
+}
+
+.campo-ayuda {
+  font-size: 0.85rem;
+  color: var(--tinta-suave);
+}
+
+.etiqueta-pendiente {
+  background: var(--amarillo);
+  color: var(--tinta);
+}
+
+.etiqueta-revision {
+  background: var(--azul-claro);
+  color: var(--azul-oscuro);
+}
+
+.etiqueta-resuelto {
+  background: #E6F4EC;
+  color: #0F6B3C;
 }
 
 .vacio {

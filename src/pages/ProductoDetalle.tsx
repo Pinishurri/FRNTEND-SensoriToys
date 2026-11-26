@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { useCart } from '../context/CartContext';
 import ProductoService, { type Producto } from '../services/producto.service';
+import { resolverImagen } from '../assets/imagenes';
 
 const ProductoDetalle = () => {
   const { id } = useParams<{ id: string }>();
@@ -78,7 +79,7 @@ const ProductoDetalle = () => {
           <div className="col-12 col-md-6">
             <div className="detalle-imagen">
               {producto.imagenUrl ? (
-                <img src={producto.imagenUrl} alt={producto.nombre} />
+                <img src={resolverImagen(producto.imagenUrl)} alt={producto.nombre} />
               ) : (
                 <span className="sin-imagen">Sin imagen</span>
               )}
