@@ -7,6 +7,7 @@ const Register = () => {
   const navigate = useNavigate();
 
   const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
   const [email, setEmail] = useState('');
   const [contrasenia, setContrasenia] = useState('');
   const [confirmacion, setConfirmacion] = useState('');
@@ -24,7 +25,7 @@ const Register = () => {
 
     setEnviando(true);
     try {
-      await UsuarioService.registrar({ nombre: nombre.trim(), email: email.trim(), contrasenia });
+      await UsuarioService.registrar({ nombre: nombre.trim(), apellido: apellido.trim(), email: email.trim(), contrasenia });
       navigate('/login', { state: { mensaje: 'Tu cuenta fue creada. Ya puedes iniciar sesión.' } });
     } catch (err) {
       setError(obtenerMensajeError(err, 'No se pudo conectar con el servidor. Inténtalo nuevamente.'));
@@ -44,16 +45,21 @@ const Register = () => {
 
             <form onSubmit={handleSubmit} className="row g-3 my-2">
               <div className="campo col-12">
-                <label htmlFor="nombre">Nombre completo</label>
+                <label htmlFor="nombre">Nombre</label>
                 <input
                   id="nombre"
                   name="nombre"
                   type="text"
-                  autoComplete="name"
+                  autoComplete="given-name"
                   value={nombre}
                   onChange={(event) => setNombre(event.target.value)}
                   required
                 />
+              </div>
+
+              <div className="campo col-12">
+                <label htmlFor="apellido">Apellidos</label>
+                <input id="apellido" name="apellido" type="text" autoComplete="family-name" value={apellido} onChange={(event) => setApellido(event.target.value)} required />
               </div>
 
               <div className="campo col-12">
